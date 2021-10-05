@@ -27,13 +27,6 @@ RUN printf "connector.name=jmx" > etc/catalog/jmx.properties
 ######## ADD DEFAULT JVM CONFIG. ANY SETTINGS CAN BE CHANGED IN BELOW LINE ########
 RUN printf -- "-server\n-Xmx16G\n-XX:-UseBiasedLocking\n-XX:+UseG1GC\n-XX:G1HeapRegionSize=32M\n-XX:+ExplicitGCInvokesConcurrent\n-XX:+ExitOnOutOfMemoryError\n-XX:+HeapDumpOnOutOfMemoryError\n-XX:-OmitStackTraceInFastThrow\n-XX:ReservedCodeCacheSize=512M\n-XX:PerMethodRecompilationCutoff=10000\n-XX:PerBytecodeRecompilationCutoff=10000\n-Djdk.attach.allowAttachSelf=true\n-Djdk.nio.maxCachedBufferSize=2000000\n" > etc/jvm.config
 
-######## ADD DEFAULT CONFIG PROPERTIES. ANY SETTINGS CAN BE CHANGED VIA BUILD ARGS ########
-ARG HOST=localhost
-ARG PORT=8099
-ARG MAX_MEMORY=50GB
-ARG MAX_MEMORY_PER_NODE=1GB
-ARG MAX_TOTAL_MEMORY_PER_NODE=2GB
-RUN printf -- "coordinator=true\nnode-scheduler.include-coordinator=false\nhttp-server.http.port=$PORT\nquery.max-memory=$MAX_MEMORY\nquery.max-memory-per-node=$MAX_MEMORY_PER_NODE\nquery.max-total-memory-per-node=$MAX_TOTAL_MEMORY_PER_NODE\ndiscovery.uri=http://$HOST:$PORT\n" > etc/config.properties
 
 ######## ADD LOG PROPERTIES ########
 ARG LOG_LEVEL=INFO
@@ -46,6 +39,14 @@ ARG DATA_DIR=/var/trino/data
 # Create trino data/log directory
 RUN mkdir -p $DATA_DIR
 RUN printf -- "node.environment=$ENV\nnode.id=ffffffff-ffff-ffff-ffff-ffffffffffff\nnode.data-dir=$DATA_DIR\n" > etc/node.properties
+
+######## ADD DEFAULT CONFIG PROPERTIES. ANY SETTINGS CAN BE CHANGED VIA BUILD ARGS ########
+ARG HOST=localhost
+ARG PORT=8099
+ARG MAX_MEMORY=50GB
+ARG MAX_MEMORY_PER_NODE=1GB
+ARG MAX_TOTAL_MEMORY_PER_NODE=2GB
+RUN printf -- "coordinator=true\nnode-scheduler.include-coordinator=false\nhttp-server.http.port=$PORT\nquery.max-memory=$MAX_MEMORY\nquery.max-memory-per-node=$MAX_MEMORY_PER_NODE\nquery.max-total-memory-per-node=$MAX_TOTAL_MEMORY_PER_NODE\ndiscovery.uri=http://$HOST:$PORT\n" > etc/config.properties
 
 ######## START SERVER ########
 EXPOSE $PORT
