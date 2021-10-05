@@ -41,7 +41,6 @@ RUN mkdir -p $DATA_DIR
 RUN printf -- "node.environment=$ENV\nnode.id=ffffffff-ffff-ffff-ffff-ffffffffffff\nnode.data-dir=$DATA_DIR\n" > etc/node.properties
 
 ######## ADD DEFAULT CONFIG PROPERTIES. ANY SETTINGS CAN BE CHANGED VIA BUILD ARGS ########
-ARG HOST=localhost
 ARG PORT=8099
 ARG MAX_MEMORY=50GB
 ARG MAX_MEMORY_PER_NODE=1GB

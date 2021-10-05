@@ -34,18 +34,19 @@ RUN printf -- "io.trino=$LOG_LEVEL" > etc/log.properties
 ######## ADD NODE PROPERTIES ########
 ARG ENV=dev
 ARG DATA_DIR=/var/trino/data
+# Node if should be different for each node/worker
+ARG NODE_ID=gggggggg-ffff-ffff-ffff-ffffffffffff
 
 # Create trino data/log directory
 RUN mkdir -p $DATA_DIR
-RUN printf -- "node.environment=$ENV\nnode.id=ffffffff-ffff-ffff-ffff-ffffffffffff\nnode.data-dir=$DATA_DIR\n" > etc/node.properties
+RUN printf -- "node.environment=$ENV\nnode.id=$NODE_ID\nnode.data-dir=$DATA_DIR\n" > etc/node.properties
 
 ######## ADD DEFAULT CONFIG PROPERTIES. ANY SETTINGS CAN BE CHANGED VIA BUILD ARGS ########
-ARG HOST=localhost
 ARG PORT=8200
-ARG CORDINATOR_URL=http://localhost:8099
 ARG MAX_MEMORY=50GB
 ARG MAX_MEMORY_PER_NODE=1GB
 ARG MAX_TOTAL_MEMORY_PER_NODE=2GB
+ARG CORDINATOR_URL=http://localhost:8099
 RUN printf -- "coordinator=false\nhttp-server.http.port=$PORT\nquery.max-memory=$MAX_MEMORY\nquery.max-memory-per-node=$MAX_MEMORY_PER_NODE\nquery.max-total-memory-per-node=$MAX_TOTAL_MEMORY_PER_NODE\ndiscovery.uri=$CORDINATOR_URL\n" > etc/config.properties
 
 ######## START SERVER ########

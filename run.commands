@@ -1,1 +1,0 @@
-docker run --rm -d --network host --name trino-cordinator-worker trino-cordinator-worker
