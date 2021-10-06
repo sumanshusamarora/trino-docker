@@ -4,45 +4,49 @@ ARG=$1
 
 # Build and run worker and host separately on localhost
 build_host_separate_localhost() {
-  docker build -t trino-cordinator -f DockerfileCordinator .
+  docker build -t trino-coordinator -f DockerfileCoordinator .
   docker build -t trino-worker -f DockerfileWorker .
-  docker run --rm -d --net host --name trino-cordinator trino-cordinator
+  docker run --rm -d --net host --name trino-coordinator trino-coordinator
   docker run --rm -d --net host --name trino-worker trino-worker
 }
 
 # Build and run worker and host separately on docker VM network
 build_host_separate_docker_vm() {
-  docker build -t trino-cordinator -f DockerfileCordinator .
-  docker run --rm -d -p 8099:8099 --name trino-cordinator trino-cordinator
-  docker build --build-arg CORDINATOR_URL=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' trino-cordinator):8099 -t trino-worker -f DockerfileWorker .
+  docker build -t trino-coordinator -f DockerfileCoordinator .
+  docker run --rm -d -p 8099:8099 --name trino-coordinator trino-coordinator
+  COORDINATOR_URL="http://$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' trino-coordinator):8099"
+  docker build --build-arg DISCOVERY_URI=${COORDINATOR_URL} -t trino-worker -f DockerfileWorker .
   docker run --rm -d -p 8200:8200 --name trino-worker trino-worker
+  echo "Coordinator running at - $COORDINATOR_URL"
 }
 
 # Build and run worker and host on single node on localhost
 build_host_single_node_localhost() {
-  docker build -t trino-worker -f DockerfileCordinatorWorker .
-  docker run --rm -d --net host --name trino-cordinator-worker trino-cordinator-worker
+  docker build -t trino-worker -f DockerfileCoordinatorWorker .
+  docker run --rm -d --net host --name trino-coordinator-worker trino-coordinator-worker
 }
 
 # Build and run worker and host on single node on docker VM network
 build_host_single_node_docker_vm() {
-  docker build -t trino-worker -f DockerfileCordinatorWorker .
-  docker run --rm -d -p 8099:8099 --name trino-cordinator-worker trino-cordinator-worker
+  docker build -t trino-worker -f DockerfileCoordinatorWorker .
+  docker run --rm -d -p 8099:8099 --name trino-coordinator-worker trino-coordinator-worker
+  COORDINATOR_URL="http://$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' trino-coordinator-worker):8099"
+  echo "Coordinator running at - $COORDINATOR_URL"
 }
 
 help_method() {
-  echo "Missing Argument"
   echo "bash ./setup.sh separate_local|separate_docker_vm|single_local|single_docker_vm|stop|help"
 }
 
 # Build and run worker and host on single node on docker VM network
 stop() {
-  docker kill $(docker ps -q)
+  docker stop trino-worker trino-coordinator trino-coordinator-worker
 }
 
 if [[ $# -eq 0 ]] ; then
-    help_method
-    exit 0
+  echo "Missing Argument"
+  help_method
+  exit 0
 fi
 
 if [ "$1" == "separate_local" ]; then

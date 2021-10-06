@@ -46,8 +46,8 @@ ARG PORT=8200
 ARG MAX_MEMORY=50GB
 ARG MAX_MEMORY_PER_NODE=1GB
 ARG MAX_TOTAL_MEMORY_PER_NODE=2GB
-ARG CORDINATOR_URL=http://localhost:8099
-RUN printf -- "coordinator=false\nhttp-server.http.port=$PORT\nquery.max-memory=$MAX_MEMORY\nquery.max-memory-per-node=$MAX_MEMORY_PER_NODE\nquery.max-total-memory-per-node=$MAX_TOTAL_MEMORY_PER_NODE\ndiscovery.uri=$CORDINATOR_URL\n" > etc/config.properties
+ARG DISCOVERY_URI=http://localhost:8099
+RUN printf -- "coordinator=false\nhttp-server.http.port=$PORT\nquery.max-memory=$MAX_MEMORY\nquery.max-memory-per-node=$MAX_MEMORY_PER_NODE\nquery.max-total-memory-per-node=$MAX_TOTAL_MEMORY_PER_NODE\ndiscovery.uri=$DISCOVERY_URI\n" > etc/config.properties
 
 ######## START SERVER ########
 EXPOSE $PORT
