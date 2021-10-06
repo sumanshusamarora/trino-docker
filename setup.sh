@@ -34,13 +34,36 @@ build_host_single_node_docker_vm() {
   echo "Coordinator running at - $COORDINATOR_URL"
 }
 
+build_host_superset_localhost() {
+  docker build -t superset -f DockerfileSuperset .
+  docker run --rm -d --net host --name superset superset
+  superset_setup
+}
+
+build_host_superset_docker_vm() {
+  docker build -t superset -f DockerfileSuperset .
+  docker run --rm -d -p 8088:8088 --name superset superset
+  superset_setup
+}
+
+superset_setup() {
+  docker exec -it superset superset fab create-admin \
+               --username admin \
+               --firstname Superset \
+               --lastname Admin \
+               --email admin@superset.com \
+               --password admin
+  docker exec -it superset superset db upgrade
+  docker exec -it superset superset init
+}
+
 help_method() {
-  echo "bash ./setup.sh separate_local|separate_docker_vm|single_local|single_docker_vm|stop|help"
+  echo "bash ./setup.sh separate_local | separate_docker_vm | single_local | single_docker_vm | stop | superset_local | superset_docker_vm | help"
 }
 
 # Build and run worker and host on single node on docker VM network
 stop() {
-  docker stop trino-worker trino-coordinator trino-coordinator-worker
+  docker stop trino-worker trino-coordinator trino-coordinator-worker superset
 }
 
 if [[ $# -eq 0 ]] ; then
@@ -57,8 +80,14 @@ elif [ "$1" == "single_local" ]; then
   build_host_single_node_localhost
 elif [ "$1" == "single_docker_vm" ]; then
   build_host_single_node_docker_vm
+elif [ "$1" == "superset_local" ]; then
+  build_host_superset_localhost
+elif [ "$1" == "superset_docker_vm" ]; then
+  build_host_superset_docker_vm
 elif [ "$1" == "stop" ]; then
   stop
 elif [ "$1" == "help" ]; then
+  help_method
+else
   help_method
 fi
