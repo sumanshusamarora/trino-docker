@@ -84,6 +84,8 @@ elif [ "$1" == "superset_local" ]; then
   build_host_superset_localhost
 elif [ "$1" == "superset_docker_vm" ]; then
   build_host_superset_docker_vm
+elif [ "$1" == "superset" ]; then
+  superset_setup
 elif [ "$1" == "stop" ]; then
   stop
 elif [ "$1" == "help" ]; then
