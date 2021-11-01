@@ -50,4 +50,4 @@ RUN printf -- "coordinator=true\nnode-scheduler.include-coordinator=false\nhttp-
 
 ######## START SERVER ########
 EXPOSE $PORT
-CMD bin/launcher start && tail -f /dev/null
+CMD bin/launcher run
