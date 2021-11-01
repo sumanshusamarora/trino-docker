@@ -51,4 +51,4 @@ RUN printf -- "coordinator=false\nhttp-server.http.port=$PORT\nquery.max-memory=
 
 ######## START SERVER ########
 EXPOSE $PORT
-CMD bin/launcher start && tail -f /dev/null
+CMD bin/launcher run
